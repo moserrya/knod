@@ -3,16 +3,18 @@ require 'uri'
 require 'pry-debugger'
 
 class TinyServer
-  attr_reader :server
+  attr_reader :server, :port
   attr_accessor :socket, :request_line
 
   DEFAULT_PORT = 4444
 
   def initialize(options = {})
-    @server = TCPServer.new('localhost', options[:port] || DEFAULT_PORT)
+    @port = options[:port] || DEFAULT_PORT
+    @server = TCPServer.new('localhost', @port)
   end
 
   def start
+    STDERR.puts "Starting server on port #{port}"
     loop do
       self.socket = server.accept
 
