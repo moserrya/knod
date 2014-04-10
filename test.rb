@@ -7,13 +7,20 @@ class TestGet < Minitest::Test
 
   def setup
     @index = 'index.html'
+    @body = "<h1>Squids are fun!</h1>"
+    File.write(@index, @body)
   end
 
   def test_valid_route_returns_200
-    File.write(@index, "<h1>Squids are fun!</h1>")
     uri = URI("http://0.0.0.0:4444/#{@index}")
     response = make_get uri
     assert_equal response.code, '200'
+  end
+
+  def test_it_serves_up_the_requested_file
+    uri = URI("http://0.0.0.0:4444/#{@index}")
+    response = make_get uri
+    assert_equal response.body, @body
   end
 
   def test_invalid_route_returns_404
