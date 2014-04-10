@@ -1,6 +1,7 @@
 require './quack'
 require 'net/http'
 require 'minitest/autorun'
+require 'json'
 
 class TestGet < Minitest::Test
 
@@ -29,6 +30,34 @@ class TestGet < Minitest::Test
 
   def make_get(uri)
     Net::HTTP.get_response uri
+  end
+end
+
+class TestPut < Minitest::Test
+  def setup
+    request = Net::HTTP::Put.new(path, header)
+    request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
+    @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
+  end
+
+  def test_it_returns_a_204
+    assert_equal @response.code, '204'
+  end
+
+  def port
+    4444
+  end
+
+  def host
+    '0.0.0.0'
+  end
+
+  def header
+    {'Content-Type' => 'application/json'}
+  end
+
+  def path
+    '/81.json'
   end
 end
 

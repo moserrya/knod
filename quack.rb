@@ -140,6 +140,4 @@ class TinyServer
     File.join(WEB_ROOT, *clean)
   end
 end
-# 
 
-# TinyServer.new.start
