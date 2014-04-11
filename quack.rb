@@ -1,6 +1,7 @@
 require 'socket'
 require 'uri'
 require 'pry-debugger'
+require 'fileutils'
 
 class TinyServer
   attr_reader :server, :port
@@ -70,14 +71,25 @@ class TinyServer
   end
 
   def do_PUT
+    response = RequestObject.new(socket)
+    route = requested_file(request_line)
+    directory = File.dirname(route)
+    FileUtils.mkdir_p(directory)
+    File.write(route, response.body)
     message = "Not Implemented"
-    socket.print response_header(501, message)
+    socket.print response_header(204, message)
     socket.print message
   end
 
   def do_POST
+    response = RequestObject.new(socket)
+    route = requested_file(request_line)
+    FileUtils.mkdir_p(route)
+    records = Dir.glob(route + "/*.json")
+    next_record = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
+    File.write(File.join(route, "#{next_record}.json"), response.body)
     message = "Not Implemented"
-    socket.print response_header(501, message)
+    socket.print response_header(201, message)
     socket.print message
   end
 
@@ -139,5 +151,41 @@ class TinyServer
 
     File.join(WEB_ROOT, *clean)
   end
+end
+
+class RequestObject
+  attr_reader :socket, :headers
+
+  def initialize(socket)
+    @socket = socket
+    parse_response
+  end
+
+  def parse_response
+    headers = {}
+    loop do
+      line = socket.gets
+      break if line == "\r\n"
+      name, value = line.strip.split(": ")
+      headers[name] = value
+    end
+    @headers = headers
+  end
+
+  def content_length
+    headers["Content-Length"].to_i
+  end
+
+  def content_type
+    headers["Content-Type"]
+  end
+
+  def body
+    @body ||= socket.read(content_length)
+  end
+end
+
+if __FILE__ == $0
+  TinyServer.new.start
 end
 
