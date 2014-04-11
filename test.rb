@@ -4,7 +4,6 @@ require 'minitest/autorun'
 require 'json'
 
 class TestGet < Minitest::Test
-
   def setup
     @index = 'index.html'
     @body = "<h1>Squids are fun!</h1>"
@@ -40,17 +39,7 @@ class TestGet < Minitest::Test
   end
 end
 
-class TestPut < Minitest::Test
-  def setup
-    request = Net::HTTP::Put.new(path, header)
-    request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
-    @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
-  end
-
-  def test_it_returns_a_204
-    assert_equal @response.code, '204'
-  end
-
+class BaseTest < Minitest::Test
   def port
     4444
   end
@@ -62,9 +51,37 @@ class TestPut < Minitest::Test
   def header
     {'Content-Type' => 'application/json'}
   end
+end
+
+class TestPut < BaseTest
+  def setup
+    request = Net::HTTP::Put.new(path, header)
+    request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
+    @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
+  end
+
+  def test_it_returns_a_204
+    assert_equal @response.code, '204'
+  end
 
   def path
     '/81.json'
+  end
+end
+
+class TestPost < BaseTest
+  def setup
+    request = Net::HTTP::Post.new(path, header)
+    request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
+    @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
+  end
+
+  def test_it_returns_a_201
+    assert_equal @response.code, '201'
+  end
+
+  def path
+    '/items/'
   end
 end
 
