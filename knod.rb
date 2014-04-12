@@ -107,11 +107,15 @@ class Knod
   end
 
   CONTENT_TYPE_MAPPING = {
-    'html' => 'text/html',
     'json' => 'application/json',
-    'txt'  => 'text/plain',
+    'bmp'  => 'image/bmp',
+    'gif'  => 'image/gif',
+    'jpg'  => 'image/jpeg',
     'png'  => 'image/png',
-    'jpg'  => 'image/jpeg'
+    'css'  => 'text/css',
+    'html' => 'text/html',
+    'txt'  => 'text/plain',
+    'xml'  => 'text/xml'
   }
 
   DEFAULT_CONTENT_TYPE = 'application/octet-stream'
