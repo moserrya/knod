@@ -3,7 +3,7 @@ require 'uri'
 require 'pry-debugger'
 require 'fileutils'
 
-class TinyServer
+class Knod
   attr_reader :server, :port, :socket, :request_line
 
   DEFAULT_PORT = 4444
@@ -184,6 +184,6 @@ class RequestObject
 end
 
 if __FILE__ == $0
-  TinyServer.new.start
+  Knod.new.start
 end
 
