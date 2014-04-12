@@ -59,6 +59,10 @@ class BaseTest < Minitest::Test
   def local_path
     File.join('.', path)
   end
+
+  def teardown
+    FileUtils.remove_entry(local_path, true)
+  end
 end
 
 class TestPut < BaseTest
@@ -82,10 +86,6 @@ class TestPut < BaseTest
 
   def path
     '/items/81.json'
-  end
-
-  def teardown
-    File.delete(local_path)
   end
 end
 
@@ -116,10 +116,6 @@ class TestPost < BaseTest
 
   def path
     '/items/'
-  end
-
-  def teardown
-    FileUtils.rm_r(local_path)
   end
 end
 

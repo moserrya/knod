@@ -17,13 +17,9 @@ class Knod
     STDERR.puts "Starting server on port #{port}"
     loop do
       @socket = server.accept
-
       @request_line = socket.gets
-
       STDERR.puts request_line
-
       public_send "do_#{requested_http_verb}"
-
       socket.close
     end
   end
