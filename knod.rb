@@ -54,20 +54,20 @@ class Knod
 
   def do_PUT
     response = RequestObject.new(socket)
-    route = requested_file
-    directory = File.dirname(route)
+    path = requested_file
+    directory = File.dirname(path)
     FileUtils.mkdir_p(directory)
-    File.write(route, response.body)
+    File.write(path, response.body)
     socket.print response_header(204)
   end
 
   def do_POST
     response = RequestObject.new(socket)
-    route = requested_file
-    FileUtils.mkdir_p(route)
-    records = Dir.glob(route + "/*.json")
+    path = requested_file
+    FileUtils.mkdir_p(path)
+    records = Dir.glob(path + "/*.json")
     next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
-    File.write(File.join(route, "#{next_id}.json"), response.body)
+    File.write(File.join(path, "#{next_id}.json"), response.body)
     message = "{\"id\":#{next_id}}"
     socket.print response_header(201, message)
     socket.print message
@@ -129,11 +129,11 @@ class Knod
 
   def requested_file
     request_uri = request_line.split[1]
-    path = URI.unescape(URI(request_uri).path)
+    local_path = URI.unescape(URI(request_uri).path)
 
     clean = []
 
-    parts = path.split("/")
+    parts = local_path.split("/")
 
     parts.each do |part|
       next if part.empty? || part == '.'
