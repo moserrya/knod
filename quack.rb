@@ -85,9 +85,9 @@ class TinyServer
     route = requested_file(request_line)
     FileUtils.mkdir_p(route)
     records = Dir.glob(route + "/*.json")
-    next_record = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
-    File.write(File.join(route, "#{next_record}.json"), response.body)
-    message = "Not Implemented"
+    next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
+    File.write(File.join(route, "#{next_id}.json"), response.body)
+    message = "{\"id\":#{next_id}}"
     socket.print response_header(201, message)
     socket.print message
   end
