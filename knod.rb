@@ -44,13 +44,8 @@ class Knod
         IO.copy_stream(file, socket) unless head
       end
     else
-      message = "File not found\n"
-
-      socket.print "HTTP/1.1 404 Not Found\r\n" <<
-                   "Content-Type: text/plain\r\n" <<
-                   "Content-Length: #{message.size}\r\n" <<
-                   "Connection: close\r\n\r\n"
-
+      message = "\"File not found\""
+      socket.print response_header(404, message)
       socket.print message unless head
     end
   end
