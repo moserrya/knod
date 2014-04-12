@@ -3,21 +3,39 @@ require 'net/http'
 require 'minitest/autorun'
 require 'json'
 
-class TestGet < Minitest::Test
+class RetrieveTest < Minitest::Test
   def setup
     @index = 'index.html'
     @body = "<h1>Squids are fun!</h1>"
     File.write(@index, @body)
   end
 
+  def teardown
+    File.delete(@index) if File.exists?(@index)
+  end
+
+  def host
+    '0.0.0.0'
+  end
+
+  def port
+    4444
+  end
+
+  def base_uri
+    "http://#{host}:#{port}"
+  end
+end
+
+class TestGet < RetrieveTest
   def test_valid_route_returns_200
-    uri = URI("http://0.0.0.0:4444/#{@index}")
+    uri = URI("#{base_uri}/#{@index}")
     response = make_get uri
     assert_equal response.code, '200'
   end
 
   def test_it_serves_up_the_requested_file
-    uri = URI("http://0.0.0.0:4444/#{@index}")
+    uri = URI("#{base_uri}/#{@index}")
     response = make_get uri
     assert_equal response.body, @body
   end
@@ -25,17 +43,21 @@ class TestGet < Minitest::Test
   def test_invalid_route_returns_404
     file = 'squidbat.html'
     File.delete(file) if File.exists?(file)
-    uri = URI("http://0.0.0.0:4444/#{file}")
+    uri = URI("#{base_uri}/#{file}")
     response = make_get uri
     assert_equal response.code, '404'
   end
 
-  def teardown
-    File.delete(@index) if File.exists?(@index)
-  end
-
   def make_get(uri)
     Net::HTTP.get_response uri
+  end
+end
+
+class TestHead < RetrieveTest
+  def test_it_does_notserve_up_the_requested_file
+    uri = URI("#{base_uri}/#{@index}")
+    response = Net::HTTP.new(host, port).head(uri)
+    assert_equal response.body, nil
   end
 end
 
