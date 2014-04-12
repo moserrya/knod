@@ -30,7 +30,7 @@ class Knod
   HTTP_VERBS = %w{GET HEAD PUT POST DELETE}
 
   def do_GET(head=false)
-    path = requested_file
+    path = requested_path
     path = File.join(path, 'index.html') if File.directory?(path)
 
     if is_file?(path)
@@ -50,13 +50,13 @@ class Knod
   end
 
   def do_DELETE
-    path = requested_file
+    path = requested_path
     File.delete(path) if is_file?(path)
     socket.print response_header(204)
   end
 
   def do_PUT
-    path = requested_file
+    path = requested_path
     directory = File.dirname(path)
     FileUtils.mkdir_p(directory)
     File.write(path, request.body)
@@ -64,7 +64,7 @@ class Knod
   end
 
   def do_POST
-    path = requested_file
+    path = requested_path
     FileUtils.mkdir_p(path)
     records = Dir.glob(path + "/*.json")
     next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
@@ -128,7 +128,7 @@ class Knod
 
   WEB_ROOT = './'
 
-  def requested_file
+  def requested_path
     request_uri = request_line.split[1]
     local_path = URI.unescape(URI(request_uri).path)
 
