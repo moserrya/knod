@@ -61,11 +61,8 @@ class Knod
 
   def do_DELETE
     path = requested_file
-    if is_file?(path)
-      File.delete(path)
-    end
-    message = ""
-    socket.print response_header(204, message)
+    File.delete(path) if is_file?(path)
+    socket.print response_header(204)
   end
 
   def do_PUT
@@ -74,8 +71,7 @@ class Knod
     directory = File.dirname(route)
     FileUtils.mkdir_p(directory)
     File.write(route, response.body)
-    message = ""
-    socket.print response_header(204, message)
+    socket.print response_header(204)
   end
 
   def do_POST
@@ -101,11 +97,11 @@ class Knod
     501 => "Not Implemented"
   }
 
-  def response_header(status_code, message)
-    "HTTP/1.1 #{status_code} #{STATUS_CODE_MAPPINGS[status_code]}\r\n" <<
-    "Content-Type: application/json\r\n" <<
-    "Content-Length: #{message.size}\r\n" <<
-    "Connection: close\r\n\r\n"
+  def response_header(status_code, message='')
+    header = "HTTP/1.1 #{status_code} #{STATUS_CODE_MAPPINGS[status_code]}\r\n"
+    header << "Content-Type: application/json\r\n" unless message.empty?
+    header << "Content-Length: #{message.size}\r\n"
+    header << "Connection: close\r\n\r\n"
   end
 
   def is_file?(path)
