@@ -56,7 +56,7 @@ end
 class TestPut < BaseTest
   def setup
     request = Net::HTTP::Put.new(path, header)
-    request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
+    request.body = {state: 'swell', predeliction: 'good challenges'}.to_json
     @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
   end
 
@@ -65,12 +65,18 @@ class TestPut < BaseTest
   end
 
   def path
-    '/81.json'
+    '/items/81.json'
+  end
+
+  def teardown
+    File.delete(File.join('.', path))
   end
 end
 
 class TestPost < BaseTest
   def setup
+    FileUtils.mkdir_p(File.join('.', path))
+    2.times {|i| File.write(File.join(".", path, "#{i+1}.json"), {state: 'noodles'})}
     request = Net::HTTP::Post.new(path, header)
     request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
     @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
@@ -80,8 +86,20 @@ class TestPost < BaseTest
     assert_equal @response.code, '201'
   end
 
+  def test_it_returns_the_id
+    assert_equal @response.body, {id: 3}.to_json
+  end
+
+  def test_it_returns_json
+    assert_equal @response.content_type, 'application/json'
+  end
+
   def path
     '/items/'
+  end
+
+  def teardown
+    FileUtils.rm_r(File.join('.', path))
   end
 end
 
