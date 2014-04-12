@@ -51,6 +51,14 @@ class BaseTest < Minitest::Test
   def header
     {'Content-Type' => 'application/json'}
   end
+
+  def path
+    raise 'not implemented'
+  end
+
+  def local_path
+    File.join('.', path)
+  end
 end
 
 class TestPut < BaseTest
@@ -64,18 +72,26 @@ class TestPut < BaseTest
     assert_equal @response.code, '204'
   end
 
+  def test_there_is_no_body
+    assert_equal @response.body, nil
+  end
+
+  def test_writing_to_the_expected_path
+    assert File.exists?(local_path) && !File.directory?(local_path)
+  end
+
   def path
     '/items/81.json'
   end
 
   def teardown
-    File.delete(File.join('.', path))
+    File.delete(local_path)
   end
 end
 
 class TestPost < BaseTest
   def setup
-    FileUtils.mkdir_p(File.join('.', path))
+    FileUtils.mkdir_p(local_path)
     2.times {|i| File.write(File.join(".", path, "#{i+1}.json"), {state: 'noodles'})}
     request = Net::HTTP::Post.new(path, header)
     request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
@@ -94,12 +110,16 @@ class TestPost < BaseTest
     assert_equal @response.content_type, 'application/json'
   end
 
+  def test_writing_to_appopriate_path
+    assert File.exists?(File.join(local_path, '3.json'))
+  end
+
   def path
     '/items/'
   end
 
   def teardown
-    FileUtils.rm_r(File.join('.', path))
+    FileUtils.rm_r(local_path)
   end
 end
 

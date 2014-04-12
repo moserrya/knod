@@ -75,9 +75,8 @@ class TinyServer
     directory = File.dirname(route)
     FileUtils.mkdir_p(directory)
     File.write(route, response.body)
-    message = "Not Implemented"
+    message = ""
     socket.print response_header(204, message)
-    socket.print message
   end
 
   def do_POST
@@ -105,7 +104,7 @@ class TinyServer
 
   def response_header(status_code, message)
     "HTTP/1.1 #{status_code} #{STATUS_CODE_MAPPINGS[status_code]}\r\n" <<
-    "Content-Type: text/plain\r\n" <<
+    "Content-Type: application/json\r\n" <<
     "Content-Length: #{message.size}\r\n" <<
     "Connection: close\r\n\r\n"
   end
