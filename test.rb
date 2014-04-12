@@ -123,3 +123,21 @@ class TestPost < BaseTest
   end
 end
 
+class TestDelete < BaseTest
+  def setup
+    File.write(local_path, 'anything')
+    @response = Net::HTTP.new(host, port).delete(path)
+  end
+
+  def test_file_deletion
+    refute File.exists?(path)
+  end
+
+  def test_returns_a_204
+    assert_equal @response.code, '204'
+  end
+
+  def path
+    '/ducklet.txt'
+  end
+end
