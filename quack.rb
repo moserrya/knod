@@ -4,8 +4,7 @@ require 'pry-debugger'
 require 'fileutils'
 
 class TinyServer
-  attr_reader :server, :port
-  attr_accessor :socket, :request_line
+  attr_reader :server, :port, :socket, :request_line
 
   DEFAULT_PORT = 4444
 
@@ -17,9 +16,9 @@ class TinyServer
   def start
     STDERR.puts "Starting server on port #{port}"
     loop do
-      self.socket = server.accept
+      @socket = server.accept
 
-      self.request_line = socket.gets
+      @request_line = socket.gets
 
       STDERR.puts request_line
 
