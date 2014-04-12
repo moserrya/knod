@@ -5,7 +5,7 @@ require 'fileutils'
 
 class Knod
   extend Forwardable
-  def_delegators :@request, :response_header, :request_line
+  def_delegators :@request, :request_line
 
   attr_reader :server, :port, :socket, :request
 
