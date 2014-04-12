@@ -4,7 +4,10 @@ require 'pry-debugger'
 require 'fileutils'
 
 class Knod
-  attr_reader :server, :port, :socket, :request_line
+  extend Forwardable
+  def_delegators :@request, :response_header, :request_line
+
+  attr_reader :server, :port, :socket, :request
 
   DEFAULT_PORT = 4444
 
@@ -17,7 +20,7 @@ class Knod
     STDERR.puts "Starting server on port #{port}"
     loop do
       @socket = server.accept
-      @request_line = socket.gets
+      @request = Request.new(socket)
       STDERR.puts request_line
       public_send "do_#{requested_http_verb}"
       socket.close
@@ -53,21 +56,19 @@ class Knod
   end
 
   def do_PUT
-    response = RequestObject.new(socket)
     path = requested_file
     directory = File.dirname(path)
     FileUtils.mkdir_p(directory)
-    File.write(path, response.body)
+    File.write(path, request.body)
     socket.print response_header(204)
   end
 
   def do_POST
-    response = RequestObject.new(socket)
     path = requested_file
     FileUtils.mkdir_p(path)
     records = Dir.glob(path + "/*.json")
     next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
-    File.write(File.join(path, "#{next_id}.json"), response.body)
+    File.write(File.join(path, "#{next_id}.json"), request.body)
     message = "{\"id\":#{next_id}}"
     socket.print response_header(201, message)
     socket.print message
@@ -144,15 +145,16 @@ class Knod
   end
 end
 
-class RequestObject
-  attr_reader :socket, :headers
+class Request
+  attr_reader :socket, :headers, :request_line
 
   def initialize(socket)
     @socket = socket
-    parse_response
+    @request_line = socket.gets
+    parse_request
   end
 
-  def parse_response
+  def parse_request
     headers = {}
     loop do
       line = socket.gets
