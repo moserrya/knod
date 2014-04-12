@@ -36,11 +36,7 @@ class Knod
 
     if is_file?(path)
       File.open(path, 'rb') do |file|
-        socket.print "HTTP/1.1 200 OK\r\n" <<
-                     "Content-Type: #{content_type(file)}\r\n" <<
-                     "Content-Length: #{file.size}\r\n" <<
-                     "Connection: close\r\n\r\n"
-
+        socket.print file_response_header(file)
         IO.copy_stream(file, socket) unless head
       end
     else
@@ -97,6 +93,13 @@ class Knod
     header << "Content-Type: application/json\r\n" unless message.empty?
     header << "Content-Length: #{message.size}\r\n"
     header << "Connection: close\r\n\r\n"
+  end
+
+  def file_response_header(file)
+    "HTTP/1.1 200 OK\r\n" <<
+    "Content-Type: #{content_type(file)}\r\n" <<
+    "Content-Length: #{file.size}\r\n" <<
+    "Connection: close\r\n\r\n"
   end
 
   def is_file?(path)
