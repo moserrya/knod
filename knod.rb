@@ -64,9 +64,8 @@ class Knod
     if is_file?(path)
       File.delete(path)
     end
-    message = "#{path} deleted"
+    message = ""
     socket.print response_header(204, message)
-    socket.print message
   end
 
   def do_PUT
