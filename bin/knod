@@ -1,5 +1,24 @@
 #!/usr/bin/env ruby
 
 require 'knod'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = 'Usage: knod [options]'
+
+  opts.separator ''
+  opts.separator 'Specific options:'
+
+  opts.on('-p', '--port [PORT]', 'set the port') do |p|
+    options[:port] = p
+  end
+
+  opts.on('-d', '--directory [DIR]', 'set the root directory') do |dir|
+    options[:root] = dir
+  end
+
+end.parse!
+
 trap("INT") { exit }
-Knod.new.start
+Knod.new(options).start
