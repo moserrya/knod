@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
 
 require 'knod'
+trap("INT") { exit }
 Knod.new.start
