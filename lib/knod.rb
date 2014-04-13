@@ -18,6 +18,10 @@ class Knod
     @server = TCPServer.new('localhost', @port)
   end
 
+  def self.start(options = {})
+    new(options).start
+  end
+
   def start
     STDERR.puts "Starting server on port #{port}"
     loop do
@@ -182,6 +186,6 @@ class Request
 end
 
 if __FILE__ == $0
-  Knod.new.start
+  Knod.start
 end
 
