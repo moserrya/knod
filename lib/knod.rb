@@ -1,7 +1,7 @@
 require 'socket'
 require 'uri'
-require 'pry-debugger'
 require 'fileutils'
+require 'forwardable'
 
 class Knod
   extend Forwardable
