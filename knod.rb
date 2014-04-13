@@ -10,11 +10,11 @@ class Knod
   attr_reader :server, :port, :socket, :request
 
   DEFAULT_PORT = 4444
-  DEFAULT_ROOT = './'
+  DEFAULT_WEB_ROOT = './'
 
   def initialize(options = {})
     @port = options[:port] || DEFAULT_PORT
-    @root = options[:root] || DEFAULT_ROOT
+    @root = options[:root] || DEFAULT_WEB_ROOT
     @server = TCPServer.new('localhost', @port)
   end
 
@@ -129,8 +129,7 @@ class Knod
   end
 
   def requested_path
-    request_uri = request_line.split[1]
-    local_path = URI.unescape(URI(request_uri).path)
+    local_path = URI.unescape(URI(request.uri).path)
 
     clean = []
 
@@ -171,6 +170,10 @@ class Request
 
   def content_type
     headers["Content-Type"]
+  end
+
+  def uri
+    @uri ||= request_line.split[1]
   end
 
   def body
