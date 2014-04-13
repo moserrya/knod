@@ -1,7 +1,7 @@
-require './knod'
 require 'net/http'
 require 'minitest/autorun'
 require 'json'
+require 'fileutils'
 
 class RetrieveTest < Minitest::Test
   def setup
