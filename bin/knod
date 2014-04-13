@@ -21,4 +21,4 @@ OptionParser.new do |opts|
 end.parse!
 
 trap("INT") { exit }
-Knod.new(options).start
+Knod.start(options)
