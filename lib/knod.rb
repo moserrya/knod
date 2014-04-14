@@ -1,12 +1,8 @@
 require 'socket'
 require 'uri'
 require 'fileutils'
-require 'forwardable'
 
 class Knod
-  extend Forwardable
-  def_delegators :@request, :request_line
-
   attr_reader :server, :port, :socket, :request
 
   DEFAULT_PORT = 4444
@@ -81,6 +77,10 @@ class Knod
   end
 
   private
+
+  def request_line
+    request.request_line
+  end
 
   STATUS_CODE_MAPPINGS = {
     200 => "OK",
@@ -178,6 +178,10 @@ class Request
 
   def uri
     @uri ||= request_line.split[1]
+  end
+
+  def method
+    @verb ||= request_line.split.first.upcase
   end
 
   def body
