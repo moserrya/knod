@@ -24,18 +24,16 @@ class Knod
       @socket = server.accept
       @request = Request.new(socket)
       STDERR.puts request_line
-      public_send "do_#{requested_http_verb}"
+      public_send "do_#{request.method}"
       socket.close
     end
   end
-
-  HTTP_VERBS = %w{GET HEAD PUT POST DELETE}
 
   def do_GET(head=false)
     path = requested_path
     path = File.join(path, 'index.html') if File.directory?(path)
 
-    if is_file?(path)
+    if File.file?(path)
       File.open(path, 'rb') do |file|
         socket.print file_response_header(file)
         IO.copy_stream(file, socket) unless head
@@ -53,7 +51,7 @@ class Knod
 
   def do_DELETE
     path = requested_path
-    File.delete(path) if is_file?(path)
+    File.delete(path) if File.file?(path)
     socket.print response_header(204)
   end
 
@@ -105,14 +103,6 @@ class Knod
     "Connection: close\r\n\r\n"
   end
 
-  def is_file?(path)
-    File.exist?(path) && !File.directory?(path)
-  end
-
-  def requested_http_verb
-    HTTP_VERBS.find {|verb| request_line.start_with? verb}
-  end
-
   CONTENT_TYPE_MAPPING = {
     'json' => 'application/json',
     'bmp'  => 'image/bmp',
@@ -145,6 +135,16 @@ class Knod
     end
 
     File.join(@root, *clean)
+  end
+
+  def method_missing(method_sym, *args, &block)
+    if method_sym.to_s.start_with?("do_")
+      message = "\"not implemented\""
+      socket.print response_header(501, message)
+      socket.print message
+    else
+      super
+    end
   end
 end
 
