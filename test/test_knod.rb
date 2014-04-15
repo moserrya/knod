@@ -4,10 +4,10 @@ require 'minitest/autorun'
 require 'json'
 require 'fileutils'
 
-knod = Knod.new port: 0
+knod  = Knod.new port: 0
 $port = knod.port
 
-thread = Thread.new do
+Thread.new do
   knod.start
 end
 
@@ -158,5 +158,19 @@ class TestDelete < BaseTest
 
   def path
     '/ducklet.txt'
+  end
+end
+
+class TestUnsupportedMethod < BaseTest
+  def setup
+    @response = Net::HTTP.new(host, $port).options(path)
+  end
+
+  def test_returns_a_501
+    assert_equal @response.code, '501'
+  end
+
+  def path
+    '/items/1.json'
   end
 end
