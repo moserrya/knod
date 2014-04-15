@@ -1,7 +1,15 @@
+require_relative '../lib/knod'
 require 'net/http'
 require 'minitest/autorun'
 require 'json'
 require 'fileutils'
+
+knod = Knod.new port: 0
+$port = knod.port
+
+thread = Thread.new do
+  knod.start
+end
 
 class RetrieveTest < Minitest::Test
   def setup
@@ -18,12 +26,8 @@ class RetrieveTest < Minitest::Test
     '0.0.0.0'
   end
 
-  def port
-    4444
-  end
-
   def base_uri
-    "http://#{host}:#{port}"
+    "http://#{host}:#{$port}"
   end
 end
 
@@ -56,15 +60,12 @@ end
 class TestHead < RetrieveTest
   def test_it_does_notserve_up_the_requested_file
     uri = URI("#{base_uri}/#{@index}")
-    response = Net::HTTP.new(host, port).head(uri)
+    response = Net::HTTP.new(host, $port).head(uri)
     assert_equal response.body, nil
   end
 end
 
 class BaseTest < Minitest::Test
-  def port
-    4444
-  end
 
   def host
     '0.0.0.0'
@@ -91,7 +92,7 @@ class TestPut < BaseTest
   def setup
     request = Net::HTTP::Put.new(path, header)
     request.body = {state: 'swell', predeliction: 'good challenges'}.to_json
-    @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
+    @response = Net::HTTP.new(host, $port).start {|http| http.request(request) }
   end
 
   def test_it_returns_a_204
@@ -117,7 +118,7 @@ class TestPost < BaseTest
     2.times {|i| File.write(File.join(".", path, "#{i+1}.json"), {state: 'noodles'})}
     request = Net::HTTP::Post.new(path, header)
     request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
-    @response = Net::HTTP.new(host, port).start {|http| http.request(request) }
+    @response = Net::HTTP.new(host, $port).start {|http| http.request(request) }
   end
 
   def test_it_returns_a_201
@@ -144,7 +145,7 @@ end
 class TestDelete < BaseTest
   def setup
     File.write(local_path, 'anything')
-    @response = Net::HTTP.new(host, port).delete(path)
+    @response = Net::HTTP.new(host, $port).delete(path)
   end
 
   def test_file_deletion
