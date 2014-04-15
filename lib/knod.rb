@@ -39,9 +39,8 @@ class Knod
         IO.copy_stream(file, socket) unless head
       end
     else
-      message = "\"File not found\""
-      socket.print response_header(404, message)
-      socket.print message unless head
+      message = head ? '' : "\"File not found\""
+      respond_with_message(404, message)
     end
   end
 
@@ -52,7 +51,7 @@ class Knod
   def do_DELETE
     path = requested_path
     File.delete(path) if File.file?(path)
-    socket.print response_header(204)
+    respond_with_header(204)
   end
 
   def do_PUT
@@ -60,7 +59,7 @@ class Knod
     directory = File.dirname(path)
     FileUtils.mkdir_p(directory)
     File.write(path, request.body)
-    socket.print response_header(204)
+    respond_with_header(204)
   end
 
   def do_POST
@@ -69,9 +68,7 @@ class Knod
     records = Dir.glob(path + "/*.json")
     next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
     File.write(File.join(path, "#{next_id}.json"), request.body)
-    message = "{\"id\":#{next_id}}"
-    socket.print response_header(201, message)
-    socket.print message
+    respond_with_message(201, "{\"id\":#{next_id}}")
   end
 
   private
@@ -94,6 +91,15 @@ class Knod
     header << "Content-Type: application/json\r\n" unless message.empty?
     header << "Content-Length: #{message.size}\r\n"
     header << "Connection: close\r\n\r\n"
+  end
+
+  def respond_with_header(status_code)
+    socket.print response_header(status_code)
+  end
+
+  def respond_with_message(status_code, message)
+    socket.print response_header(status_code, message)
+    socket.print message
   end
 
   def file_response_header(file)
