@@ -3,15 +3,15 @@ require 'uri'
 require 'fileutils'
 
 class Knod
-  attr_reader :server, :port, :socket, :request
+  attr_reader :server, :socket, :request
 
   DEFAULT_PORT = 4444
   DEFAULT_WEB_ROOT = './'
 
   def initialize(options = {})
-    @port = options[:port] || DEFAULT_PORT
+    port  = options[:port] || DEFAULT_PORT
     @root = options[:root] || DEFAULT_WEB_ROOT
-    @server = TCPServer.new('localhost', @port)
+    @server = TCPServer.new('localhost', port)
   end
 
   def self.start(options = {})
@@ -69,6 +69,10 @@ class Knod
     next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
     File.write(File.join(path, "#{next_id}.json"), request.body)
     respond_with_message(201, "{\"id\":#{next_id}}")
+  end
+
+  def port
+    server.addr[1]
   end
 
   private
