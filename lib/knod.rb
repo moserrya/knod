@@ -36,7 +36,7 @@ class Knod
     log e.backtrace
     respond_with_header 500
   ensure
-    socket.close
+    socket.close if socket
   end
 
   def do_GET(head=false)
