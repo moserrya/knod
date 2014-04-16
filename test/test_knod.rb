@@ -4,11 +4,11 @@ require 'minitest/autorun'
 require 'json'
 require 'fileutils'
 
-knod  = Knod.new port: 0
-$port = knod.port
+$knod = Knod.new(port: 0, logging: false)
+$port = $knod.port
 
 Thread.new do
-  knod.start
+  $knod.start
 end
 
 class RetrieveTest < Minitest::Test
@@ -168,6 +168,23 @@ class TestUnsupportedMethod < BaseTest
 
   def test_returns_a_501
     assert_equal @response.code, '501'
+  end
+
+  def path
+    '/items/1.json'
+  end
+end
+
+class TestServerError < BaseTest
+  def setup
+    def $knod.do_DELETE
+      raise 'boom!'
+    end
+    @response = Net::HTTP.new(host, $port).delete(path)
+  end
+
+  def test_returns_a_500
+    assert_equal @response.code, '500'
   end
 
   def path
