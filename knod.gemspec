@@ -4,8 +4,8 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 
 Gem::Specification.new do |gem|
   gem.name          = 'knod'
-  gem.version       = '0.3.1'
-  gem.date          = '2014-04-14'
+  gem.version       = '0.4.0'
+  gem.date          = '2014-04-15'
   gem.authors       = ['Ryan Moser']
   gem.email         = 'ryanpmoser@gmail.com'
   gem.homepage      = 'https://github.com/moserrya/knod'
