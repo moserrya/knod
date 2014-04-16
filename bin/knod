@@ -10,12 +10,16 @@ OptionParser.new do |opts|
   opts.separator ''
   opts.separator 'Specific options:'
 
-  opts.on('-p', '--port [PORT]', 'set the port') do |p|
+  opts.on('-p', '--port [PORT]', 'Set the port') do |p|
     options[:port] = p
   end
 
-  opts.on('-d', '--directory [DIR]', 'set the root directory') do |dir|
+  opts.on('-d', '--directory [DIR]', 'Set the root directory') do |dir|
     options[:root] = dir
+  end
+
+  opts.on('--[no-]logging', "Use this flag to disable logging") do |logging|
+    options[:logging] = logging
   end
 
 end.parse!
