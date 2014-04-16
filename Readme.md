@@ -10,12 +10,14 @@ Knod is a lightweight HTTP server designed to facilitate front end development w
 
 The Knod gem comes with an executable; you can run it from the command line with `knod`. Knod will default to port 4444 and the current directory. You can change these with command line arguments (-p and -d, respectively).
 
-You can also run it by requiring `knod` and calling `Knod.start`. Knod accepts an options hash that lets you change the port and directory:
+You can also run it by requiring `knod` and calling `Knod.start`. Knod accepts an options hash that lets you change the port, root directory, and logging:
 
 ```ruby
-options = {port: 1234, directory: 'some/directory'}
+options = {port: 1234, root: './some/directory', logging: false}
 Knod.start options
 ```
+
+Logging is enabled by default. The server will select an open ephemeral port at random if you pass in 0 as the port.
 
 GET requests map suffixes into MIME types. Data is considered to be `application/octet-stream` if the content type is unrecognized.
 
