@@ -11,6 +11,7 @@ class Knod
   def initialize(options = {})
     port  = options[:port] || DEFAULT_PORT
     @root = options[:root] || DEFAULT_WEB_ROOT
+    @logging = options.fetch(:logging, true)
     @server = TCPServer.new('localhost', port)
   end
 
@@ -19,14 +20,23 @@ class Knod
   end
 
   def start
-    STDERR.puts "Starting server on port #{port}"
+    log "Starting server on port #{port}"
     loop do
-      @socket = server.accept
-      @request = Request.new(socket)
-      STDERR.puts request_line
-      public_send "do_#{request.method}"
-      socket.close
+      accept_request_and_respond
     end
+  end
+
+  def accept_request_and_respond
+    @socket = server.accept
+    @request = Request.new(socket)
+    log request_line
+    public_send "do_#{request.method}"
+  rescue => e
+    log "#{e.class}: #{e.message}"
+    log e.backtrace
+    respond_with_header 500
+  ensure
+    socket.close
   end
 
   def do_GET(head=false)
@@ -76,6 +86,10 @@ class Knod
   end
 
   private
+
+  def log(message)
+    STDERR.puts message if @logging
+  end
 
   def request_line
     request.request_line
