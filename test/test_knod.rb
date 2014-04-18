@@ -18,6 +18,10 @@ class RetrieveTest < Minitest::Test
     File.write(@index, @body)
   end
 
+  def connection
+    Connection.new(base_uri)
+  end
+
   def teardown
     File.delete(@index) if File.exists?(@index)
   end
@@ -33,34 +37,26 @@ end
 
 class TestGet < RetrieveTest
   def test_valid_route_returns_200
-    uri = URI("#{base_uri}/#{@index}")
-    response = make_get uri
+    response = connection.get "/#{@index}"
     assert_equal response.code, '200'
   end
 
   def test_it_serves_up_the_requested_file
-    uri = URI("#{base_uri}/#{@index}")
-    response = make_get uri
+    response = connection.get "/#{@index}"
     assert_equal response.body, @body
   end
 
   def test_invalid_route_returns_404
     file = 'squidbat.html'
     File.delete(file) if File.exists?(file)
-    uri = URI("#{base_uri}/#{file}")
-    response = make_get uri
+    response = connection.get "/#{file}"
     assert_equal response.code, '404'
-  end
-
-  def make_get(uri)
-    Net::HTTP.get_response uri
   end
 end
 
 class TestHead < RetrieveTest
   def test_it_does_notserve_up_the_requested_file
-    uri = URI("#{base_uri}/#{@index}")
-    response = Net::HTTP.new(host, $port).head(uri)
+    response = connection.head "/#{@index}"
     assert_equal response.body, nil
   end
 end
@@ -190,4 +186,56 @@ class TestServerError < BaseTest
   def path
     '/items/1.json'
   end
+end
+
+
+class Connection
+
+  VERB_MAP = {
+    get:    Net::HTTP::Get,
+    post:   Net::HTTP::Post,
+    put:    Net::HTTP::Put,
+    delete: Net::HTTP::Delete,
+    head:   Net::HTTP::Head
+  }
+
+  def initialize(endpoint)
+    uri = URI.parse(endpoint)
+    @http = Net::HTTP.new(uri.host, uri.port)
+  end
+
+  VERB_MAP.keys.each do |method|
+    define_method method, ->(path, params=nil) {request_json method, path, params}
+  end
+
+  private
+
+  def request_json(method, path, params)
+    response = request(method, path, params)
+    body = JSON.parse(response.body)
+
+    OpenStruct.new(:code => response.code, :body => body)
+  rescue
+    response
+  end
+
+  def request(method, path, params = {})
+    case method
+    when :get, :head
+      full_path = encode_path_params(path, params)
+      request = VERB_MAP[method.to_sym].new(full_path)
+    else
+      request = VERB_MAP[method.to_sym].new(path)
+      request.set_form_data(params)
+    end
+
+    @http.request(request)
+  end
+
+  def encode_path_params(path, params)
+    return path if params.nil?
+    encoded = URI.encode_www_form(params)
+    [path, encoded].join("?")
+  end
+
 end
