@@ -1,4 +1,5 @@
 require 'net/http'
+require 'json'
 
 class Connection
 
@@ -24,7 +25,7 @@ class Connection
 
   def request_json(method, path, params)
     response = request(method, path, params)
-    response.body = JSON.parse(response.body)
+    response.body = JSON.parse(response.body, symbolize_names: true)
     response
   rescue
     response
