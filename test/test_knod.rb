@@ -1,7 +1,6 @@
 require_relative '../lib/knod'
 require 'connection'
 require 'minitest/autorun'
-require 'fileutils'
 
 $knod = Knod.new(port: 0, logging: false)
 $port = $knod.port
