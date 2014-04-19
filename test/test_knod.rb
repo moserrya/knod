@@ -10,27 +10,31 @@ Thread.new do
   $knod.start
 end
 
+def parse_json_file(file)
+  JSON.parse(File.read(file), symbolize_names: true)
+end
+
 describe Knod, "a tiny http server" do
   let(:connection) {Connection.new("http://0.0.0.0:#{$port}")}
 
-  describe 'safe methods' do
+  describe 'non-writing methods' do
     before do
-      @index = 'index.html'
+      @path = 'index.html'
       @body  = "<h1>Squids are fun!</h1>"
-      File.write(@index, @body)
+      File.write(@path, @body)
     end
 
     after do
-      FileUtils.remove_entry(@index, true)
+      FileUtils.remove_entry(@path, true)
     end
 
     it 'responds with 200 when the route is valid' do
-      response = connection.get "/#{@index}"
+      response = connection.get @path
       response.code.must_equal '200'
     end
 
     it 'responds with the body of the requested file' do
-      response = connection.get "/#{@index}"
+      response = connection.get @path
       response.body.must_equal @body
     end
 
@@ -45,13 +49,69 @@ describe Knod, "a tiny http server" do
     end
 
     it 'responds to HEAD requests without a body' do
-      response = connection.head "/#{@index}"
+      response = connection.head @path
       response.body.must_be_nil
+    end
+
+    it 'responds to unsupported methods with a 501' do
+      response = connection.options @path
+      response.code.must_equal '501'
+    end
+
+    it 'deletes files at the specified path' do
+      response = connection.delete @path
+      File.exists?(@path).must_equal false
+    end
+
+    it 'responds to delete requests with a 204' do
+      response = connection.delete @path
+      response.code.must_equal '204'
+    end
+  end
+
+  describe 'PUT' do
+    let(:directory) {'index'}
+    let(:path) {"#{directory}/81.json"}
+    let(:data) {{state: 'swell', predeliction: 'good challenges'}}
+
+    it 'returns a 204 on success' do
+      response = connection.put path, data
+      response.code.must_equal '204'
+    end
+
+    it 'does not return a body' do
+      response = connection.put path, data
+      response.body.must_be_nil
+    end
+
+    it 'writes to the local path' do
+      connection.put path, data
+      File.file?(path).must_equal true
+    end
+
+    it 'writes the data to the file as json' do
+      connection.put path, data
+      parse_json_file(path).must_equal data
+    end
+
+    after do
+      FileUtils.remove_entry(directory, true)
+    end
+  end
+
+  describe 'error handling' do
+    before do
+      def $knod.do_DELETE
+        raise 'boom!'
+      end
+    end
+
+    it 'responds to server errors with a 500' do
+      response = connection.delete '/index.html'
+      response.code.must_equal '500'
     end
   end
 end
-
-
 
 class BaseTest < Minitest::Test
 
@@ -73,28 +133,6 @@ class BaseTest < Minitest::Test
 
   def teardown
     FileUtils.remove_entry(local_path, true)
-  end
-end
-
-class TestPut < BaseTest
-  def setup
-    @response = connection.put path, {state: 'swell', predeliction: 'good challenges'}
-  end
-
-  def test_it_returns_a_204
-    assert_equal @response.code, '204'
-  end
-
-  def test_there_is_no_body
-    assert_equal @response.body, nil
-  end
-
-  def test_writing_to_the_expected_path
-    assert File.exists?(local_path) && !File.directory?(local_path)
-  end
-
-  def path
-    '/items/81.json'
   end
 end
 
@@ -127,53 +165,4 @@ class TestPost < BaseTest
   end
 end
 
-class TestDelete < BaseTest
-  def setup
-    File.write(local_path, 'anything')
-    @response = connection.delete(path)
-  end
-
-  def test_file_deletion
-    refute File.exists?(path)
-  end
-
-  def test_returns_a_204
-    assert_equal @response.code, '204'
-  end
-
-  def path
-    '/ducklet.txt'
-  end
-end
-
-class TestUnsupportedMethod < BaseTest
-  def setup
-    @response = connection.options(path)
-  end
-
-  def test_returns_a_501
-    assert_equal @response.code, '501'
-  end
-
-  def path
-    '/items/1.json'
-  end
-end
-
-class TestServerError < BaseTest
-  def setup
-    def $knod.do_DELETE
-      raise 'boom!'
-    end
-    @response = connection.delete(path)
-  end
-
-  def test_returns_a_500
-    assert_equal @response.code, '500'
-  end
-
-  def path
-    '/items/1.json'
-  end
-end
 
