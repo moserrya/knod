@@ -79,6 +79,14 @@ class BaseTest < Minitest::Test
     File.join('.', path)
   end
 
+  def connection
+    Connection.new(base_uri)
+  end
+
+  def base_uri
+    "http://#{host}:#{$port}"
+  end
+
   def teardown
     FileUtils.remove_entry(local_path, true)
   end
