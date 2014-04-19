@@ -94,9 +94,7 @@ end
 
 class TestPut < BaseTest
   def setup
-    request = Net::HTTP::Put.new(path, header)
-    request.body = {state: 'swell', predeliction: 'good challenges'}.to_json
-    @response = Net::HTTP.new(host, $port).start {|http| http.request(request) }
+    @response = connection.put path, {state: 'swell', predeliction: 'good challenges'}
   end
 
   def test_it_returns_a_204
