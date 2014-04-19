@@ -218,9 +218,8 @@ class Connection
 
   def request_json(method, path, params)
     response = request(method, path, params)
-    body = JSON.parse(response.body)
-
-    OpenStruct.new(:code => response.code, :body => body, :content_type => response.content_type)
+    response.body = JSON.parse(response.body)
+    response
   rescue
     response
   end
