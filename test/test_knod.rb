@@ -10,65 +10,50 @@ Thread.new do
   $knod.start
 end
 
-class RetrieveTest < Minitest::Test
-  def setup
-    @index = 'index.html'
-    @body = "<h1>Squids are fun!</h1>"
-    File.write(@index, @body)
-  end
+describe Knod, "a tiny http server" do
+  let(:connection) {Connection.new("http://0.0.0.0:#{$port}")}
 
-  def connection
-    Connection.new(base_uri)
-  end
+  describe 'safe methods' do
+    before do
+      @index = 'index.html'
+      @body  = "<h1>Squids are fun!</h1>"
+      File.write(@index, @body)
+    end
 
-  def teardown
-    File.delete(@index) if File.exists?(@index)
-  end
+    after do
+      FileUtils.remove_entry(@index, true)
+    end
 
-  def host
-    '0.0.0.0'
-  end
+    it 'responds with 200 when the route is valid' do
+      response = connection.get "/#{@index}"
+      response.code.must_equal '200'
+    end
 
-  def base_uri
-    "http://#{host}:#{$port}"
+    it 'responds with the body of the requested file' do
+      response = connection.get "/#{@index}"
+      response.body.must_equal @body
+    end
+
+    it 'implictly serves up the index' do
+      response = connection.get "/"
+      response.body.must_equal @body
+    end
+
+    it 'returns a 404 if the file does not exist' do
+      response = connection.get "/squidbat.random"
+      response.code.must_equal '404'
+    end
+
+    it 'responds to HEAD requests without a body' do
+      response = connection.head "/#{@index}"
+      response.body.must_be_nil
+    end
   end
 end
 
-class TestGet < RetrieveTest
-  def test_valid_route_returns_200
-    response = connection.get "/#{@index}"
-    assert_equal response.code, '200'
-  end
 
-  def test_it_serves_up_the_requested_file
-    response = connection.get "/#{@index}"
-    assert_equal response.body, @body
-  end
-
-  def test_invalid_route_returns_404
-    file = 'squidbat.html'
-    File.delete(file) if File.exists?(file)
-    response = connection.get "/#{file}"
-    assert_equal response.code, '404'
-  end
-end
-
-class TestHead < RetrieveTest
-  def test_it_does_notserve_up_the_requested_file
-    response = connection.head "/#{@index}"
-    assert_equal response.body, nil
-  end
-end
 
 class BaseTest < Minitest::Test
-
-  def host
-    '0.0.0.0'
-  end
-
-  def header
-    {'Content-Type' => 'application/json'}
-  end
 
   def path
     raise 'not implemented'
@@ -83,7 +68,7 @@ class BaseTest < Minitest::Test
   end
 
   def base_uri
-    "http://#{host}:#{$port}"
+    "http://0.0.0.0:#{$port}"
   end
 
   def teardown
