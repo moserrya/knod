@@ -234,7 +234,7 @@ class Connection
       request = VERB_MAP[method.to_sym].new(full_path)
     else
       request = VERB_MAP[method.to_sym].new(path)
-      request.set_form_data(params)
+      request.body = params.to_json
     end
 
     @http.request(request)
