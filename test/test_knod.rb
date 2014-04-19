@@ -99,6 +99,47 @@ describe Knod, "a tiny http server" do
     end
   end
 
+  describe 'POST' do
+    let(:path) {'/items'}
+    let(:local_path) {File.join('.', path)}
+    let(:data) {{id: 81, state: 'swell', predeliction: 'good challenges'}}
+
+    before do
+      FileUtils.mkdir_p(local_path)
+      2.times {|i| File.write(File.join(".", path, "#{i+1}.json"), {state: 'noodles'})}
+    end
+
+    after do
+      FileUtils.remove_entry(local_path, true)
+    end
+
+    it 'returns a 201 on success' do
+      response = connection.post path, data
+      response.code.must_equal '201'
+    end
+
+    it 'creates the required directory if it does not exist' do
+      FileUtils.remove_entry(local_path, true)
+      connection.post path, data
+      Dir.exists?(local_path).must_equal true
+    end
+
+    it 'writes to the correct path' do
+      connection.post path, data
+      File.file?(File.join(local_path, '3.json')).must_equal true
+    end
+
+    it 'responds with json' do
+      response = connection.post path, data
+      response.content_type.must_equal 'application/json'
+    end
+
+    it 'returns the id of the file created' do
+      response = connection.post path, data
+      response.body.must_equal ({id: 3})
+    end
+  end
+
   describe 'error handling' do
     before do
       def $knod.do_DELETE
@@ -113,56 +154,5 @@ describe Knod, "a tiny http server" do
   end
 end
 
-class BaseTest < Minitest::Test
-
-  def path
-    raise 'not implemented'
-  end
-
-  def local_path
-    File.join('.', path)
-  end
-
-  def connection
-    Connection.new(base_uri)
-  end
-
-  def base_uri
-    "http://0.0.0.0:#{$port}"
-  end
-
-  def teardown
-    FileUtils.remove_entry(local_path, true)
-  end
-end
-
-class TestPost < BaseTest
-  def setup
-    FileUtils.mkdir_p(local_path)
-    2.times {|i| File.write(File.join(".", path, "#{i+1}.json"), {state: 'noodles'})}
-    data = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
-    @response = connection.post path, data
-  end
-
-  def test_it_returns_a_201
-    assert_equal @response.code, '201'
-  end
-
-  def test_it_returns_the_id
-    assert_equal @response.body, {id: 3}
-  end
-
-  def test_it_returns_json
-    assert_equal @response.content_type, 'application/json'
-  end
-
-  def test_writing_to_appopriate_path
-    assert File.exists?(File.join(local_path, '3.json'))
-  end
-
-  def path
-    '/items/'
-  end
-end
 
 
