@@ -118,9 +118,8 @@ class TestPost < BaseTest
   def setup
     FileUtils.mkdir_p(local_path)
     2.times {|i| File.write(File.join(".", path, "#{i+1}.json"), {state: 'noodles'})}
-    request = Net::HTTP::Post.new(path, header)
-    request.body = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
-    @response = Net::HTTP.new(host, $port).start {|http| http.request(request) }
+    data = {id: 81, state: 'swell', predeliction: 'good challenges'}.to_json
+    @response = connection.post path, data
   end
 
   def test_it_returns_a_201
@@ -128,7 +127,7 @@ class TestPost < BaseTest
   end
 
   def test_it_returns_the_id
-    assert_equal @response.body, {id: 3}.to_json
+    assert_equal @response.body, {'id' => 3}
   end
 
   def test_it_returns_json
@@ -147,7 +146,7 @@ end
 class TestDelete < BaseTest
   def setup
     File.write(local_path, 'anything')
-    @response = Net::HTTP.new(host, $port).delete(path)
+    @response = connection.delete(path)
   end
 
   def test_file_deletion
@@ -165,7 +164,7 @@ end
 
 class TestUnsupportedMethod < BaseTest
   def setup
-    @response = Net::HTTP.new(host, $port).options(path)
+    @response = connection.options(path)
   end
 
   def test_returns_a_501
@@ -182,7 +181,7 @@ class TestServerError < BaseTest
     def $knod.do_DELETE
       raise 'boom!'
     end
-    @response = Net::HTTP.new(host, $port).delete(path)
+    @response = connection.delete(path)
   end
 
   def test_returns_a_500
@@ -202,7 +201,8 @@ class Connection
     post:   Net::HTTP::Post,
     put:    Net::HTTP::Put,
     delete: Net::HTTP::Delete,
-    head:   Net::HTTP::Head
+    head:   Net::HTTP::Head,
+    options: Net::HTTP::Options
   }
 
   def initialize(endpoint)
@@ -220,7 +220,7 @@ class Connection
     response = request(method, path, params)
     body = JSON.parse(response.body)
 
-    OpenStruct.new(:code => response.code, :body => body)
+    OpenStruct.new(:code => response.code, :body => body, :content_type => response.content_type)
   rescue
     response
   end
