@@ -1,7 +1,6 @@
 require_relative '../lib/knod'
 require 'connection'
 require 'minitest/autorun'
-require 'json'
 require 'fileutils'
 
 $knod = Knod.new(port: 0, logging: false)
@@ -127,7 +126,7 @@ class TestPost < BaseTest
   end
 
   def test_it_returns_the_id
-    assert_equal @response.body, {'id' => 3}
+    assert_equal @response.body, {id: 3}
   end
 
   def test_it_returns_json
