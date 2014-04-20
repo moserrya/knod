@@ -1,8 +1,8 @@
-require_relative '../lib/knod'
+require 'knod'
 require 'connection'
 require 'minitest/autorun'
 
-$knod = Knod.new(port: 0, logging: false)
+$knod = Knod::Server.new(port: 0, logging: false)
 $port = $knod.port
 
 Thread.new do
