@@ -12,7 +12,6 @@ class Connection
     get:    Net::HTTP::Get,
     post:   Net::HTTP::Post,
     put:    Net::HTTP::Put,
-    patch:  Net::HTTP::Patch,
     delete: Net::HTTP::Delete,
     head:   Net::HTTP::Head,
     options: Net::HTTP::Options
