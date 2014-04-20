@@ -1,5 +1,7 @@
 #Knod
 
+[![Gem Version](https://badge.fury.io/rb/knod.svg)](http://badge.fury.io/rb/knod) [![Build Status](https://travis-ci.org/moserrya/knod.svg?branch=master)](https://travis-ci.org/moserrya/knod) [![Code Climate](https://codeclimate.com/github/moserrya/knod.png)](https://codeclimate.com/github/moserrya/knod)
+
 Knod is a lightweight HTTP server designed to facilitate front end development when the corresponding back end is missing or incomplete. It responds to GET, PUT, POST, and DELETE, serving up, writing to, and deleting from the directory of your choosing.
 
 ## Installation
