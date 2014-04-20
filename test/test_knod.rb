@@ -141,13 +141,19 @@ describe Knod, "a tiny http server" do
 
   describe 'error handling' do
     before do
-      def $knod.do_DELETE
+      def $knod.do_HEAD
         raise 'boom!'
       end
     end
 
+    after do
+      def $knod.do_HEAD
+        do_GET(head=true)
+      end
+    end
+
     it 'responds to server errors with a 500' do
-      response = connection.delete '/index.html'
+      response = connection.head '/index.html'
       response.code.must_equal '500'
     end
   end
