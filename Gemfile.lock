@@ -1,0 +1,16 @@
+PATH
+  remote: .
+  specs:
+    knod (0.4.1)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    rake (10.3.1)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  knod!
+  rake (~> 10)
