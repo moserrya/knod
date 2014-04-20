@@ -1,11 +1,12 @@
 #coding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'knod/version'
 
 Gem::Specification.new do |gem|
   gem.name          = 'knod'
-  gem.version       = '0.4.1'
-  gem.date          = '2014-04-15'
+  gem.version       = Knod::VERSION
+  gem.date          = '2014-04-19'
   gem.authors       = ['Ryan Moser']
   gem.email         = 'ryanpmoser@gmail.com'
   gem.homepage      = 'https://github.com/moserrya/knod'
