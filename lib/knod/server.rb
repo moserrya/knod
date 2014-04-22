@@ -156,9 +156,7 @@ module Knod
 
     def method_missing(method_sym, *args, &block)
       if method_sym.to_s.start_with?("do_")
-        message = "\"not implemented\""
-        socket.print response_header(501, message)
-        socket.print message
+        respond_with_message(501, "\"not implemented\"")
       else
         super
       end
