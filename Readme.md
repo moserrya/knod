@@ -21,6 +21,8 @@ Knod.start options
 
 Logging is enabled by default. The server will select an open ephemeral port at random if you pass in 0 as the port.
 
+Knod sanitizes the path on all requests and does not allow access to folders outside of the root directory where it is run.
+
 GET requests map suffixes into MIME types. Data is considered to be `application/octet-stream` if the content type is unrecognized.
 
 All data from PUT and POST requests is stored as JSON. If the pathway specified in the request does not exist, Knod will create it.
