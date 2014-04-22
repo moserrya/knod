@@ -139,38 +139,12 @@ describe Knod, "a tiny http server" do
     end
   end
 
-<<<<<<< HEAD
   describe 'error handling' do
     before do
       def $knod.do_HEAD
         raise 'boom!'
       end
     end
-=======
-class TestPatch < BaseTest
-  def setup
-    @data = {a: 1, b: {c: 1, d: 3}}
-    File.write(local_path, @data.to_json)
-    @request = Net::HTTP::Patch.new(path, header)
-    @request.body = @data.to_json
-  end
-
-  def test_creates_resource_if_it_does_not_exist
-    FileUtils.remove_entry(local_path, true)
-    Net::HTTP.new(host, $port).start {|http| http.request(@request) }
-    assert File.file?(local_path)
-  end
-
-  def path
-    '/noodles.json'
-  end
-end
-
-class TestUnsupportedMethod < BaseTest
-  def setup
-    @response = Net::HTTP.new(host, $port).options(path)
-  end
->>>>>>> [TEST] setup PATCH method tests
 
     after do
       def $knod.do_HEAD
