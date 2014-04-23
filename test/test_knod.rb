@@ -73,14 +73,9 @@ describe Knod, "a tiny http server" do
     let(:path) {"#{directory}/81.json"}
     let(:data) {{state: 'swell', predeliction: 'good challenges'}}
 
-    it 'returns a 204 on success' do
+    it 'returns a 200 on success' do
       response = connection.put path, data
-      response.code.must_equal '204'
-    end
-
-    it 'does not return a body' do
-      response = connection.put path, data
-      response.body.must_be_nil
+      response.code.must_equal '200'
     end
 
     it 'writes to the local path' do
@@ -136,6 +131,37 @@ describe Knod, "a tiny http server" do
     it 'returns the id of the file created' do
       response = connection.post path, data
       response.body.must_equal ({id: 3})
+    end
+  end
+
+  describe 'PATCH' do
+    let(:directory) {'index'}
+    let(:path) {"#{directory}/13.json"}
+    let(:existing_data) {{base: 3, nested: {a: 1, c: 3}}}
+    let(:patch_data) {{nested: {a: nil, b: 2}}}
+
+    before do
+      FileUtils.mkdir_p(directory)
+      File.write(path, existing_data.to_json)
+    end
+
+    it 'creates the file if it does not exist' do
+      connection.patch path, patch_data
+      File.file?(path).must_equal true
+    end
+
+    it 'responds with 200 on success' do
+      response = connection.patch path, patch_data
+      response.code.must_equal '200'
+    end
+
+    it 'merges the request data with existing data' do
+      connection.patch path, patch_data
+      parse_json_file(path).must_equal({:base=>3, :nested=>{:c=>3, :b=>2}})
+    end
+
+    after do
+      FileUtils.remove_entry(directory, true)
     end
   end
 
