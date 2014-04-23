@@ -1,5 +1,6 @@
 module Knod
   class Server
+    using HashWithPatchMerge
     attr_reader :server, :socket, :request
 
     DEFAULT_PORT = 4444
