@@ -59,11 +59,20 @@ module Knod
     end
 
     def do_PUT
-      path = requested_path
-      directory = File.dirname(path)
-      FileUtils.mkdir_p(directory)
-      File.write(path, request.body)
-      respond_with_header(204)
+      write_to_path(requested_path) do |path|
+        File.write(path, request.body)
+      end
+    end
+
+    def do_PATCH
+      write_to_path(requested_path) do |path|
+        if File.file?(path)
+          merged_data = merge_json(File.read(path), request.body)
+          File.write(path, merged_data)
+        else
+          File.write(path, request.body)
+        end
+      end
     end
 
     def do_POST
@@ -80,6 +89,19 @@ module Knod
     end
 
     private
+
+    def write_to_path(path)
+      directory = File.dirname(path)
+      FileUtils.mkdir_p(directory)
+      status_code = yield path
+      respond_with_message(200, "\"Success\"")
+    end
+
+    def merge_json(file, request_body)
+      file = JSON.parse(file)
+      request_body = JSON.parse(request_body)
+      file.patch_merge(request_body).to_json
+    end
 
     def log(message)
       STDERR.puts message if @logging
