@@ -146,6 +146,7 @@ describe Knod, "a tiny http server" do
     end
 
     it 'creates the file if it does not exist' do
+      File.delete(path)
       connection.patch path, patch_data
       File.file?(path).must_equal true
     end
