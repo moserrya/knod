@@ -5,7 +5,9 @@ require 'optparse'
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = 'Usage: knod [options]'
+  cmd = File.basename($0)
+
+  opts.banner = "Usage: #{cmd} [options]"
 
   opts.separator ''
   opts.separator 'Specific options:'
@@ -20,6 +22,11 @@ OptionParser.new do |opts|
 
   opts.on('--[no-]logging', "Use this flag to disable logging") do |logging|
     options[:logging] = logging
+  end
+
+  opts.on('-v', '--version', 'Show version') do
+    puts "#{cmd} v#{Knod::VERSION}"
+    exit
   end
 
 end.parse!

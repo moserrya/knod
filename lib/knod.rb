@@ -5,6 +5,7 @@ require 'json'
 require 'knod/request'
 require 'knod/patch_merge'
 require 'knod/server'
+require 'knod/version'
 
 module Knod
   def self.start(options = {})
