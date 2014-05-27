@@ -93,7 +93,7 @@ module Knod
     def write_to_path(path)
       directory = File.dirname(path)
       FileUtils.mkdir_p(directory)
-      status_code = yield path
+      yield path
       respond_with_message(200, "\"Success\"")
     end
 
