@@ -28,7 +28,7 @@ module Knod
     rescue => e
       log "#{e.class}: #{e.message}"
       log e.backtrace
-      respond_with_header 500
+      respond 500
     ensure
       socket.close if socket
     end
@@ -44,7 +44,7 @@ module Knod
         end
       else
         message = head ? '' : "\"File not found\""
-        respond_with_message(404, message)
+        respond(404, message)
       end
     end
 
@@ -55,7 +55,7 @@ module Knod
     def do_DELETE
       path = requested_path
       File.delete(path) if File.file?(path)
-      respond_with_header(204)
+      respond 204
     end
 
     def do_PUT
@@ -81,7 +81,7 @@ module Knod
       records = Dir.glob(path + "/*.json")
       next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
       File.write(File.join(path, "#{next_id}.json"), request.body)
-      respond_with_message(201, "{\"id\":#{next_id}}")
+      respond(201, "{\"id\":#{next_id}}")
     end
 
     def port
@@ -94,7 +94,7 @@ module Knod
       directory = File.dirname(path)
       FileUtils.mkdir_p(directory)
       yield path
-      respond_with_message(200, "\"Success\"")
+      respond(200, "\"Success\"")
     end
 
     def merge_json(file, request_body)
@@ -120,20 +120,16 @@ module Knod
       501 => "Not Implemented"
     }
 
-    def response_header(status_code, message='')
-      header = "HTTP/1.1 #{status_code} #{STATUS_CODE_MAPPINGS[status_code]}\r\n"
+    def response_header(status_code, message)
+      header = "HTTP/1.1 #{status_code} #{STATUS_CODE_MAPPINGS.fetch(status_code)}\r\n"
       header << "Content-Type: application/json\r\n" unless message.empty?
       header << "Content-Length: #{message.size}\r\n"
       header << "Connection: close\r\n\r\n"
     end
 
-    def respond_with_header(status_code)
-      socket.print response_header(status_code)
-    end
-
-    def respond_with_message(status_code, message)
+    def respond(status_code, message='')
       socket.print response_header(status_code, message)
-      socket.print message
+      socket.print message unless message.empty?
     end
 
     def file_response_header(file)
@@ -179,7 +175,7 @@ module Knod
 
     def method_missing(method_sym, *args, &block)
       if method_sym.to_s.start_with?("do_")
-        respond_with_message(501, "\"not implemented\"")
+        respond(501, "\"not implemented\"")
       else
         super
       end
