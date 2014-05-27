@@ -6,11 +6,11 @@ module Knod
     DEFAULT_PORT = 4444
     DEFAULT_WEB_ROOT = './'
 
-    def initialize(options = {})
-      port  = options[:port] || DEFAULT_PORT
-      @root = options[:root] || DEFAULT_WEB_ROOT
+    def initialize(options={})
+      port     = options.fetch(:port, DEFAULT_PORT)
+      @root    = options.fetch(:root, DEFAULT_WEB_ROOT)
       @logging = options.fetch(:logging, true)
-      @server = TCPServer.new('0.0.0.0', port)
+      @server  = TCPServer.new('0.0.0.0', port)
     end
 
     def start
