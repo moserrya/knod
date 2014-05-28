@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    knod (0.5.1)
+    knod (0.5.2)
 
 GEM
   remote: https://rubygems.org/
