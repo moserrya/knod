@@ -6,7 +6,13 @@ Knod is a lightweight HTTP server designed to facilitate front end development w
 
 ## Installation
 
+Ruby 2.1 and above:
+
 ```gem install knod```
+
+Older versions of Ruby:
+
+```gem install knod -v 0.4.4``` (does not support PATCH)
 
 ## Usage
 
