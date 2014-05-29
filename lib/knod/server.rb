@@ -61,21 +61,18 @@ module Knod
     end
 
     def do_PUT
-      write_to_path(requested_path) do |path|
-        write_file(path, request.body)
-      end
+      write_to_path(requested_path, request.body)
       respond(200, "\"Success\"")
     end
 
     def do_PATCH
-      write_to_path(requested_path) do |path|
-        if file?(path)
-          merged_data = merge_json(read_file(path), request.body)
-          write_file(path, merged_data)
-        else
-          write_file(path, request.body)
-        end
-      end
+      path = requested_path
+      data = if file?(path)
+               merge_json(read_file(path), request.body)
+             else
+               request.body
+             end
+      write_to_path(path, data)
       respond(200, "\"Success\"")
     end
 
@@ -93,9 +90,10 @@ module Knod
 
     private
 
-    def write_to_path(path)
-      create_directory(dirname(path))
-      yield path
+    def write_to_path(path, data)
+      directory_name = dirname(path)
+      create_directory(directory_name)
+      write_file(path, data)
     end
 
     def max_id_in_path(path)
