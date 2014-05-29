@@ -62,6 +62,7 @@ module Knod
       write_to_path(requested_path) do |path|
         File.write(path, request.body)
       end
+      respond(200, "\"Success\"")
     end
 
     def do_PATCH
@@ -73,6 +74,7 @@ module Knod
           File.write(path, request.body)
         end
       end
+      respond(200, "\"Success\"")
     end
 
     def do_POST
@@ -94,7 +96,6 @@ module Knod
       directory = File.dirname(path)
       FileUtils.mkdir_p(directory)
       yield path
-      respond(200, "\"Success\"")
     end
 
     def merge_json(file, request_body)
