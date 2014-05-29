@@ -1,5 +1,7 @@
 module Knod
   class Server
+    include FileUtilities
+
     using HashWithPatchMerge
     attr_reader :server, :socket, :request
 
@@ -35,9 +37,9 @@ module Knod
 
     def do_GET(head=false)
       path = requested_path
-      path = File.join(path, 'index.html') if File.directory?(path)
+      path = join_path(path, 'index.html') if directory?(path)
 
-      if File.file?(path)
+      if file?(path)
         File.open(path, 'rb') do |file|
           socket.print file_response_header(file)
           IO.copy_stream(file, socket) unless head
@@ -54,24 +56,24 @@ module Knod
 
     def do_DELETE
       path = requested_path
-      File.delete(path) if File.file?(path)
+      delete_file(path) if file?(path)
       respond 204
     end
 
     def do_PUT
       write_to_path(requested_path) do |path|
-        File.write(path, request.body)
+        write_file(path, request.body)
       end
       respond(200, "\"Success\"")
     end
 
     def do_PATCH
       write_to_path(requested_path) do |path|
-        if File.file?(path)
-          merged_data = merge_json(File.read(path), request.body)
-          File.write(path, merged_data)
+        if file?(path)
+          merged_data = merge_json(read_file(path), request.body)
+          write_file(path, merged_data)
         else
-          File.write(path, request.body)
+          write_file(path, request.body)
         end
       end
       respond(200, "\"Success\"")
@@ -79,10 +81,9 @@ module Knod
 
     def do_POST
       path = requested_path
-      FileUtils.mkdir_p(path)
-      records = Dir.glob(path + "/*.json")
-      next_id = (records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0) + 1
-      File.write(File.join(path, "#{next_id}.json"), request.body)
+      create_directory(path)
+      next_id = max_id_in_path(path) + 1
+      write_file(join_path(path, "#{next_id}.json"), request.body)
       respond(201, "{\"id\":#{next_id}}")
     end
 
@@ -93,9 +94,13 @@ module Knod
     private
 
     def write_to_path(path)
-      directory = File.dirname(path)
-      FileUtils.mkdir_p(directory)
+      create_directory(dirname(path))
       yield path
+    end
+
+    def max_id_in_path(path)
+      records = Dir.glob(path + "/*.json")
+      records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0
     end
 
     def merge_json(file, request_body)
@@ -155,7 +160,7 @@ module Knod
     DEFAULT_CONTENT_TYPE = 'application/octet-stream'
 
     def content_type(path)
-      ext = File.extname(path).split('.').last
+      ext = file_extension(path)
       CONTENT_TYPE_MAPPING[ext] || DEFAULT_CONTENT_TYPE
     end
 
