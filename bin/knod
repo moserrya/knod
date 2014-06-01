@@ -31,5 +31,5 @@ OptionParser.new do |opts|
 
 end.parse!
 
-trap("INT") { exit }
+trap("INT") { exit! }
 Knod.start(options)
