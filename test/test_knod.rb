@@ -134,35 +134,37 @@ describe Knod, "a tiny http server" do
     end
   end
 
-  describe 'PATCH' do
-    let(:directory) {'index'}
-    let(:path) {"#{directory}/13.json"}
-    let(:existing_data) {{base: 3, nested: {a: 1, c: 3}}}
-    let(:patch_data) {{nested: {a: nil, b: 2}}}
+  if RUBY_VERSION.to_f >= 2.1
+    describe 'PATCH' do
+      let(:directory) {'index'}
+      let(:path) {"#{directory}/13.json"}
+      let(:existing_data) {{base: 3, nested: {a: 1, c: 3}}}
+      let(:patch_data) {{nested: {a: nil, b: 2}}}
 
-    before do
-      FileUtils.mkdir_p(directory)
-      File.write(path, existing_data.to_json)
-    end
+      before do
+        FileUtils.mkdir_p(directory)
+        File.write(path, existing_data.to_json)
+      end
 
-    it 'creates the file if it does not exist' do
-      File.delete(path)
-      connection.patch path, patch_data
-      File.file?(path).must_equal true
-    end
+      it 'creates the file if it does not exist' do
+        File.delete(path)
+        connection.patch path, patch_data
+        File.file?(path).must_equal true
+      end
 
-    it 'responds with 200 on success' do
-      response = connection.patch path, patch_data
-      response.code.must_equal '200'
-    end
+      it 'responds with 200 on success' do
+        response = connection.patch path, patch_data
+        response.code.must_equal '200'
+      end
 
-    it 'merges the request data with existing data' do
-      connection.patch path, patch_data
-      parse_json_file(path).must_equal({:base=>3, :nested=>{:c=>3, :b=>2}})
-    end
+      it 'merges the request data with existing data' do
+        connection.patch path, patch_data
+        parse_json_file(path).must_equal({:base=>3, :nested=>{:c=>3, :b=>2}})
+      end
 
-    after do
-      FileUtils.remove_entry(directory, true)
+      after do
+        FileUtils.remove_entry(directory, true)
+      end
     end
   end
 
