@@ -2,7 +2,7 @@
 
 [![Gem Version](https://badge.fury.io/rb/knod.svg)](http://badge.fury.io/rb/knod) [![Build Status](https://travis-ci.org/moserrya/knod.svg?branch=master)](https://travis-ci.org/moserrya/knod) [![Code Climate](https://codeclimate.com/github/moserrya/knod.png)](https://codeclimate.com/github/moserrya/knod)
 
-Knod is a lightweight HTTP server designed to help with front end development when the corresponding back end is missing or incomplete. It responds to GET, PUT, POST, PATCH, and DELETE, serving up, writing to, and deleting from the directory of your choice. Knod has no dependencies outside of the Ruby standard library.
+Knod is a simple HTTP server for prototyping rich JavaScript apps. It responds to GET, PUT, POST, PATCH, and DELETE, serving up, writing to, and deleting from the directory of your choice. Knod has no dependencies outside of the Ruby standard library.
 
 ## Installation
 
