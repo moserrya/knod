@@ -15,7 +15,4 @@ module Knod
   end
 end
 
-if __FILE__ == $0
-  Knod.start
-end
-
+Knod.start if __FILE__ == $PROGRAM_NAME

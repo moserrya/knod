@@ -7,7 +7,7 @@ module Knod
     DEFAULT_PORT = 4444
     DEFAULT_WEB_ROOT = './'
 
-    def initialize(options={})
+    def initialize(options = {})
       port     = options.fetch(:port) { DEFAULT_PORT }
       @root    = options.fetch(:root) { DEFAULT_WEB_ROOT }
       @logging = options.fetch(:logging) { true }
@@ -34,7 +34,7 @@ module Knod
       socket.close if socket
     end
 
-    def do_GET(head=false)
+    def do_GET(head = false)
       path = requested_path
       path = join_path(path, 'index.html') if directory?(path)
 
@@ -50,7 +50,7 @@ module Knod
     end
 
     def do_HEAD
-      do_GET(head=true)
+      do_GET(head = true)
     end
 
     def do_DELETE
@@ -100,8 +100,8 @@ module Knod
     end
 
     def max_id_in_path(path)
-      records = Dir.glob(path + "/*.json")
-      records.map {|r| File.basename(r, ".json") }.map(&:to_i).max || 0
+      records = Dir.glob(path + '/*.json')
+      records.map { |r| File.basename(r, '.json') }.map(&:to_i).max || 0
     end
 
     def merge_json(file, request_body)
@@ -119,12 +119,12 @@ module Knod
     end
 
     STATUS_CODE_MAPPINGS = {
-      200 => "OK",
-      201 => "Created",
-      204 => "No Content",
-      404 => "Not Found",
-      500 => "Internal Server Error",
-      501 => "Not Implemented"
+      200 => 'OK',
+      201 => 'Created',
+      204 => 'No Content',
+      404 => 'Not Found',
+      500 => 'Internal Server Error',
+      501 => 'Not Implemented'
     }
 
     def response_header(status_code, message)
@@ -134,15 +134,15 @@ module Knod
       header << "Connection: close\r\n\r\n"
     end
 
-    def respond(status_code, message='')
+    def respond(status_code, message = '')
       socket.print response_header(status_code, message)
       socket.print message unless message.empty?
     end
 
     def file_response_header(file)
-      "HTTP/1.1 200 OK\r\n" <<
-      "Content-Type: #{content_type(file)}\r\n" <<
-      "Content-Length: #{file.size}\r\n" <<
+      "HTTP/1.1 200 OK\r\n" \
+      "Content-Type: #{content_type(file)}\r\n" \
+      "Content-Length: #{file.size}\r\n" \
       "Connection: close\r\n\r\n"
     end
 
@@ -170,7 +170,7 @@ module Knod
 
       clean = []
 
-      parts = local_path.split("/")
+      parts = local_path.split('/')
 
       parts.each do |part|
         next if part.empty? || part == '.'
@@ -181,8 +181,8 @@ module Knod
     end
 
     def method_missing(method_sym, *args, &block)
-      if method_sym.to_s.start_with?("do_")
-        respond(501, "\"not implemented\"")
+      if method_sym.to_s.start_with?('do_')
+        respond(501, '"not implemented"')
       else
         super
       end
