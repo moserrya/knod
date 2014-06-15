@@ -13,18 +13,18 @@ module Knod
       loop do
         line = socket.gets
         break if line == "\r\n"
-        name, value = line.strip.split(": ")
+        name, value = line.strip.split(': ')
         headers[name] = value
       end
       @headers = headers
     end
 
     def content_length
-      headers["Content-Length"].to_i
+      headers['Content-Length'].to_i
     end
 
     def content_type
-      headers["Content-Type"]
+      headers['Content-Type']
     end
 
     def uri
