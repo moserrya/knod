@@ -37,11 +37,6 @@ describe Knod, "a tiny http server" do
       response.body.must_equal @body
     end
 
-    it 'implictly serves up the index' do
-      response = connection.get "/"
-      response.body.must_equal @body
-    end
-
     it 'returns a 404 if the file does not exist' do
       response = connection.get "/squidbat.random"
       response.code.must_equal '404'
@@ -65,6 +60,25 @@ describe Knod, "a tiny http server" do
     it 'responds to delete requests with a 204' do
       response = connection.delete @path
       response.code.must_equal '204'
+    end
+
+    describe 'contatenates files into a json array' do
+      let(:path) {'index'}
+      let(:data) { 3.times.map { |i| { id: i+1, state: 'squiddy' } } }
+
+      before do
+        FileUtils.mkdir_p(path)
+        data.each_with_index {|d, i| File.write(File.join(".", path, "#{i+1}.json"), d.to_json)}
+      end
+
+      it 'should concatenate file contents into an array' do
+        response = connection.get path
+        response.body.must_equal data
+      end
+
+      after do
+        FileUtils.remove_entry(path, true)
+      end
     end
   end
 
