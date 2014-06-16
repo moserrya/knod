@@ -36,13 +36,17 @@ module Knod
 
     def do_GET(head = false)
       path = requested_path
-      path = join_path(path, 'index.html') if directory?(path)
 
       if file?(path)
         File.open(path, 'rb') do |file|
           socket.print file_response_header(file)
           IO.copy_stream(file, socket) unless head
         end
+      elsif directory?(path)
+        files = Dir.glob(join_path(path, "*"))
+        data = files.map { |f| File.read(f) }
+        json_data = '[' + data.join(',') + ']'
+        respond(200, json_data)
       else
         message = head ? '' : "\"File not found\""
         respond(404, message)
