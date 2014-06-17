@@ -64,7 +64,7 @@ describe Knod, "a tiny http server" do
 
     describe 'contatenates files into a json array' do
       let(:path) {'index'}
-      let(:data) { 3.times.map { |i| { id: i+1, state: 'squiddy' } }.sort_by { |h| h[:id] } }
+      let(:data) { 3.times.map { |i| { id: i+1, state: 'squiddy' } } }
 
       before do
         FileUtils.mkdir_p(path)
@@ -73,7 +73,7 @@ describe Knod, "a tiny http server" do
 
       it 'should concatenate file contents into an array' do
         response = connection.get path
-        response.body.must_equal data
+        response.body.sort_by { |h| h[:id] }.must_equal data
       end
 
       after do
