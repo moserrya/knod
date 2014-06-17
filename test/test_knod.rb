@@ -64,7 +64,7 @@ describe Knod, "a tiny http server" do
 
     describe 'contatenates files into a json array' do
       let(:path) {'index'}
-      let(:data) { 3.times.map { |i| { id: i+1, state: 'squiddy' } } }
+      let(:data) { 3.times.map { |i| { id: i+1, state: 'squiddy' } }.sort_by { |h| h[:id] } }
 
       before do
         FileUtils.mkdir_p(path)
