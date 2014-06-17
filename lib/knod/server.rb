@@ -43,10 +43,7 @@ module Knod
           IO.copy_stream(file, socket) unless head
         end
       elsif directory?(path)
-        files = Dir.glob(join_path(path, "*"))
-        data = files.map { |f| File.read(f) }
-        json_data = '[' + data.join(',') + ']'
-        respond(200, json_data)
+        respond(200, concat_json(path))
       else
         message = head ? '' : "\"File not found\""
         respond(404, message)

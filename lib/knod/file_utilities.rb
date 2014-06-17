@@ -14,5 +14,11 @@ module Knod
     def file_extension(path)
       File.extname(path).split('.').last
     end
+
+    def concat_json(path)
+      files = Dir.glob(join_path(path, "*"))
+      data = files.map { |f| File.read(f) }
+      json_data = '[' + data.join(',') + ']'
+    end
   end
 end
