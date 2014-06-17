@@ -23,7 +23,7 @@ Logging is enabled by default. The server will select an open ephemeral port at 
 
 Knod sanitizes the path on all requests and does not allow access to folders outside of the root directory where it is run.
 
-GET requests map suffixes into MIME types. Data is considered to be `application/octet-stream` if the content type is unrecognized.
+If the path for a GET request is a file, file will be mapped to its MIME type based on the file suffix. Data is considered to be `application/octet-stream` if the content type is unrecognized. If the path for a GET request is a directory, Knod will concatenate the contents of all files in the directory into a JSON array.
 
 All data from PUT, POST, and PATCH requests is stored as JSON. If the pathway specified in the request does not exist, Knod will create it.
 
