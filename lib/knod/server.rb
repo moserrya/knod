@@ -132,6 +132,7 @@ module Knod
       header = "HTTP/1.1 #{status_code} #{STATUS_CODE_MAPPINGS.fetch(status_code)}\r\n"
       header << "Content-Type: application/json\r\n" unless message.empty?
       header << "Content-Length: #{message.size}\r\n"
+      header << "Access-Control-Allow-Origin: *\r\n"
       header << "Connection: close\r\n\r\n"
     end
 
