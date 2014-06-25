@@ -16,7 +16,7 @@ module Knod
     end
 
     def concat_json(path)
-      files = Dir.glob(join_path(path, "*"))
+      files = Dir.glob(join_path(path, "*")).sort
       data = files.map { |f| File.read(f) }
       json_data = '[' + data.join(',') + ']'
     end

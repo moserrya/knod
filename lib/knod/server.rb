@@ -102,7 +102,7 @@ module Knod
 
     def max_id_in_path(path)
       records = Dir.glob(path + '/*.json')
-      records.map { |r| File.basename(r, '.json') }.map(&:to_i).max || 0
+      records.map { |r| File.basename(r, '.json').to_i }.max || 0
     end
 
     def merge_json(file, request_body)

@@ -78,7 +78,7 @@ describe Knod, "a tiny http server" do
 
       it 'should concatenate file contents into an array' do
         response = connection.get path
-        response.body.sort_by { |h| h[:id] }.must_equal data
+        response.body.must_equal data
       end
 
       it 'responds with Cross-Origin Resource Sharing header' do
