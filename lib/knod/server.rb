@@ -145,6 +145,7 @@ module Knod
       "HTTP/1.1 200 OK\r\n" \
       "Content-Type: #{content_type(file)}\r\n" \
       "Content-Length: #{file.size}\r\n" \
+      "Access-Control-Allow-Origin: *\r\n" \
       "Connection: close\r\n\r\n"
     end
 
