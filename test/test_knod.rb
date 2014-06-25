@@ -62,6 +62,11 @@ describe Knod, "a tiny http server" do
       response.code.must_equal '204'
     end
 
+    it 'responds with Cross-Origin Resource Sharing header' do
+      response = connection.get @path
+      response['Access-Control-Allow-Origin'].must_equal '*'
+    end
+
     describe 'contatenates files into a json array' do
       let(:path) {'index'}
       let(:data) { 3.times.map { |i| { id: i+1, state: 'squiddy' } } }
@@ -74,6 +79,11 @@ describe Knod, "a tiny http server" do
       it 'should concatenate file contents into an array' do
         response = connection.get path
         response.body.sort_by { |h| h[:id] }.must_equal data
+      end
+
+      it 'responds with Cross-Origin Resource Sharing header' do
+        response = connection.get path
+        response['Access-Control-Allow-Origin'].must_equal '*'
       end
 
       after do
