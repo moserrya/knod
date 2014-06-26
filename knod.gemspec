@@ -6,7 +6,7 @@ require 'knod/version'
 Gem::Specification.new do |gem|
   gem.name          = 'knod'
   gem.version       = Knod::VERSION
-  gem.date          = '2014-06-17'
+  gem.date          = '2014-06-25'
   gem.authors       = ['Ryan Moser']
   gem.email         = 'ryanpmoser@gmail.com'
   gem.homepage      = 'https://github.com/moserrya/knod'
