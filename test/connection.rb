@@ -18,7 +18,7 @@ class Connection
     options: Net::HTTP::Options
   }
 
-  VERB_MAP.keys.each do |method|
+  VERB_MAP.each_key do |method|
     define_method method, ->(path, params=nil) {request_json method, path, params}
   end
 
