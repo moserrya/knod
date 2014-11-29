@@ -167,7 +167,7 @@ module Knod
 
     def content_type(path)
       ext = file_extension(path)
-      CONTENT_TYPE_MAPPING[ext] || DEFAULT_CONTENT_TYPE
+      CONTENT_TYPE_MAPPING.fetch(ext) { DEFAULT_CONTENT_TYPE }
     end
 
     def requested_path
