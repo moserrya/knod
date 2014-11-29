@@ -17,12 +17,14 @@ module Knod
     def start
       log "Starting server on port #{port}"
       loop do
-        accept_request_and_respond
+        Thread.start(server.accept) do |client|
+          dup.accept_request_and_respond(client)
+        end
       end
     end
 
-    def accept_request_and_respond
-      @client = server.accept
+    def accept_request_and_respond(client)
+      @client = client
       @request = Request.new(client)
       log request_line
       public_send "do_#{request.method}"
