@@ -9,12 +9,12 @@ class Connection
   end
 
   VERB_MAP = {
-    get:    Net::HTTP::Get,
-    post:   Net::HTTP::Post,
-    put:    Net::HTTP::Put,
-    patch:  Net::HTTP::Patch,
-    delete: Net::HTTP::Delete,
-    head:   Net::HTTP::Head,
+    get:     Net::HTTP::Get,
+    post:    Net::HTTP::Post,
+    put:     Net::HTTP::Put,
+    patch:   Net::HTTP::Patch,
+    delete:  Net::HTTP::Delete,
+    head:    Net::HTTP::Head,
     options: Net::HTTP::Options
   }
 
@@ -32,13 +32,13 @@ class Connection
     response
   end
 
-  def request(method, path, params = {})
+  def request(method, path, params)
     case method
     when :get, :head
-      full_path = encode_path_params(path, params)
-      request = VERB_MAP[method.to_sym].new(full_path)
+      encoded_path = encode_path_params(path, params)
+      request = VERB_MAP[method].new(encoded_path)
     else
-      request = VERB_MAP[method.to_sym].new(path)
+      request = VERB_MAP[method].new(path)
       request.body = params.to_json
     end
 
