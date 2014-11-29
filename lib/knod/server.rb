@@ -2,7 +2,7 @@ module Knod
   class Server
     include FileUtilities
 
-    attr_reader :server, :socket, :request
+    attr_reader :server, :client, :request
 
     DEFAULT_PORT = 4444
     DEFAULT_WEB_ROOT = './'
@@ -22,8 +22,8 @@ module Knod
     end
 
     def accept_request_and_respond
-      @socket = server.accept
-      @request = Request.new(socket)
+      @client = server.accept
+      @request = Request.new(client)
       log request_line
       public_send "do_#{request.method}"
     rescue => e
@@ -31,7 +31,7 @@ module Knod
       log e.backtrace
       respond 500
     ensure
-      socket.close if socket
+      client.close if client
     end
 
     def do_GET(head = false)
@@ -39,8 +39,8 @@ module Knod
 
       if file?(path)
         File.open(path, 'rb') do |file|
-          socket.print file_response_header(file)
-          IO.copy_stream(file, socket) unless head
+          client.print file_response_header(file)
+          IO.copy_stream(file, client) unless head
         end
       elsif directory?(path)
         respond(200, concat_json(path))
@@ -137,8 +137,8 @@ module Knod
     end
 
     def respond(status_code, message = '')
-      socket.print response_header(status_code, message)
-      socket.print message unless message.empty?
+      client.print response_header(status_code, message)
+      client.print message unless message.empty?
     end
 
     def file_response_header(file)
