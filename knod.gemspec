@@ -6,7 +6,7 @@ require 'knod/version'
 Gem::Specification.new do |gem|
   gem.name          = 'knod'
   gem.version       = Knod::VERSION
-  gem.date          = '2014-06-25'
+  gem.date          = '2016-09-11'
   gem.authors       = ['Ryan Moser']
   gem.email         = 'ryanpmoser@gmail.com'
   gem.homepage      = 'https://github.com/moserrya/knod'
@@ -21,5 +21,6 @@ Gem::Specification.new do |gem|
 
   gem.required_ruby_version = '>= 2.0'
 
-  gem.add_development_dependency "rake", '~> 10'
+  gem.add_development_dependency 'rake', '~> 10'
+  gem.add_development_dependency 'minitest', '~> 5'
 end
