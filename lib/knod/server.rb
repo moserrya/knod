@@ -67,19 +67,17 @@ module Knod
       respond(200, "\"Success\"")
     end
 
-    if RUBY_VERSION.to_f >= 2.1
-      using HashWithPatchMerge
+    using HashWithPatchMerge
 
-      def do_PATCH
-        path = requested_path
-        data = if file?(path)
-                 merge_json(read_file(path), request.body)
-               else
-                 request.body
-               end
-        write_to_path(path, data)
-        respond(200, "\"Success\"")
-      end
+    def do_PATCH
+      path = requested_path
+      data = if file?(path)
+               merge_json(read_file(path), request.body)
+             else
+               request.body
+             end
+      write_to_path(path, data)
+      respond(200, "\"Success\"")
     end
 
     def do_POST
