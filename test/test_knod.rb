@@ -14,7 +14,7 @@ def parse_json_file(file)
 end
 
 describe Knod, "a tiny http server" do
-  let(:connection) {Connection.new("http://0.0.0.0:#{$port}")}
+  let(:connection) {Connection.new("http://localhost:#{$port}")}
 
   describe 'non-writing methods' do
     before do

@@ -16,6 +16,10 @@ OptionParser.new do |opts|
     options[:port] = p
   end
 
+  opts.on('-b, --binding [IP]', 'Bind to specified IP') do |b|
+    options[:binding] = b
+  end
+
   opts.on('-d', '--directory [DIR]', 'Set the root directory') do |dir|
     options[:root] = dir
   end
